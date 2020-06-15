@@ -54,4 +54,9 @@ type TasksInterface []struct {
 	RunnerStatusCode string  `json:"runnerStatusCode"`
 	Duration         float64 `json:"duration"`
 	DataSource       string  `json:"dataSource"`
+	Location         struct {
+		Host    string `json:"host"`
+		Port    string `json:"size"`
+		TlsPort string `json:"tlsPort"`
+	} `json:"location"`
 }
