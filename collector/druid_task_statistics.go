@@ -77,7 +77,7 @@ func Collect(tasks TasksInterface) {
     })
 
     for k, v := range taskPerPods {
-        v.PodName = fmt.Sprintf("%v-%v", podNamePrefix, k)
+        v.PodName = fmt.Sprintf("%v-%v", *podNamePrefix, k)
         v.collect()
     }
 }
