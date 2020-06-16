@@ -31,6 +31,10 @@ func (t *taskPerPod) availableCount() int {
     return t.taskCount["RUNNING"] + t.taskCount["PENDING"]
 }
 
+func (t *taskPerPod) historyCount() int {
+    return t.taskCount["SUCCESS"] + t.taskCount["FAILED"]
+}
+
 func (t *taskPerPod) collect() {
     for k, v := range t.taskCount {
         taskStatisticsGauge.WithLabelValues(k, t.PodName).Set(float64(v))
@@ -73,7 +77,9 @@ func Collect(tasks TasksInterface) {
     }
 
     sort.SliceStable(taskPerPods, func(i, j int) bool {
-        return taskPerPods[i].availableCount() > taskPerPods[j].availableCount()
+        return taskPerPods[i].availableCount() > taskPerPods[j].availableCount() ||
+            (taskPerPods[i].availableCount() == taskPerPods[j].availableCount() &&
+                taskPerPods[i].historyCount() > taskPerPods[j].historyCount())
     })
 
     for k, v := range taskPerPods {
