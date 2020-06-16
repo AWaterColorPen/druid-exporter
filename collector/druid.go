@@ -95,7 +95,7 @@ func Collector() *MetricCollector {
 		),
 		DruidTasks: prometheus.NewDesc("druid_tasks_duration",
 			"Druid tasks duration and state",
-			[]string{"datasource", "groupd_id", "task_status", "created_time", "pod_name"}, nil,
+			[]string{"datasource", "groupd_id", "task_status", "created_time"}, nil,
 		),
 		DruidSupervisors: prometheus.NewDesc("druid_supervisors",
 			"Druid supervisors status",
@@ -133,7 +133,7 @@ func (collector *MetricCollector) Collect(ch chan<- prometheus.Metric) {
 
 	for _, data := range GetDruidTasksData(tasksURL) {
 		ch <- prometheus.MustNewConstMetric(collector.DruidTasks,
-			prometheus.GaugeValue, data.Duration, data.DataSource, data.GroupID, data.Status, data.CreatedTime, "druid-middle-manager-0")
+			prometheus.GaugeValue, data.Duration, data.DataSource, data.GroupID, data.Status, data.CreatedTime)
 	}
 
 	for _, data := range GetDruidData(supervisorURL) {
@@ -141,4 +141,6 @@ func (collector *MetricCollector) Collect(ch chan<- prometheus.Metric) {
 			prometheus.GaugeValue, float64(1), fmt.Sprintf("%v", data["id"]),
 			fmt.Sprintf("%v", data["healthy"]), fmt.Sprintf("%v", data["detailedState"]))
 	}
+
+	Collect(GetDruidTasksData(tasksURL))
 }
