@@ -153,6 +153,7 @@ func (collector *MetricCollector) Collect(ch chan<- prometheus.Metric) {
 			prometheus.GaugeValue, float64(data.Properties.Segments.ReplicatedSize), data.Name)
 	}
 
+	ts := &taskStatistics{}
 	workers := getDruidWorkersData(workersURL)
 	for _, data := range GetDruidTasksData(tasksURL) {
 		hostname := ""
@@ -172,7 +173,10 @@ func (collector *MetricCollector) Collect(ch chan<- prometheus.Metric) {
 		}
 		ch <- prometheus.MustNewConstMetric(collector.DruidTasks,
 			prometheus.GaugeValue, data.Duration, hostname, data.DataSource, data.ID, data.GroupID, data.Status, data.CreatedTime)
+
+		ts.Record(hostname, data.Status)
 	}
+	ts.Collect()
 
 	for _, data := range GetDruidData(supervisorURL) {
 		ch <- prometheus.MustNewConstMetric(collector.DruidSupervisors,
